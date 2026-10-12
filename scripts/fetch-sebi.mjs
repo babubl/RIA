@@ -25,7 +25,9 @@ const file = new URL('data/sebi.json', ROOT);
 const prev = JSON.parse(await readFile(file, 'utf8').catch(() => '{"items":[]}'));
 if (!fresh.length) { console.warn('SEBI unreachable; kept previous data'); process.exit(0); }
 const seen = new Set();
-const items = [...fresh.filter((i) => i.ia), ...(prev.items || [])]
+// Rules only: enforcement orders name individuals and don't belong on a client-facing page.
+const KEEP = new Set(['Circular', 'Master circular', 'Regulation', 'Press release', 'Consultation']);
+const items = [...fresh.filter((i) => i.ia && KEEP.has(i.type)), ...(prev.items || []).filter((i) => KEEP.has(i.type))]
   .filter((i) => { const k = i.link + '|' + i.title; if (seen.has(k)) return false; seen.add(k); return true; })
   .sort((a, b) => String(b.date).localeCompare(String(a.date))).slice(0, 40);
 await writeFile(file, JSON.stringify({ updatedAt: new Date().toISOString(), sources: [RSS, LISTING], items }) + '\n');
