@@ -1,0 +1,11 @@
+{
+  "note": "Update by the 7th of every month (SEBI circular dated June 2, 2025). Add the month that just ended to 'monthly' and refresh 'lastMonth' and 'annual'.",
+  "asOf": "[Month YYYY]",
+  "lastMonth": [
+    { "from": "Directly from investors", "pendingLastMonth": 0, "received": 0, "resolved": 0, "pending": 0, "over3Months": 0, "avgResolutionDays": "" },
+    { "from": "SEBI (SCORES)", "pendingLastMonth": 0, "received": 0, "resolved": 0, "pending": 0, "over3Months": 0, "avgResolutionDays": "" },
+    { "from": "Other sources (if any)", "pendingLastMonth": 0, "received": 0, "resolved": 0, "pending": 0, "over3Months": 0, "avgResolutionDays": "" }
+  ],
+  "monthly": [],
+  "annual": []
+}

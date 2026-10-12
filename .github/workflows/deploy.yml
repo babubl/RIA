@@ -1,0 +1,48 @@
+name: Test, refresh SEBI updates and deploy
+
+on:
+  schedule:
+    - cron: '23 3 * * *'   # 08:53 IST daily
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 20
+      - name: Tests (maths, fee limits, mandatory texts)
+        run: node --test tests/*.test.mjs
+      - name: Refresh SEBI adviser circulars
+        run: node scripts/fetch-sebi.mjs
+      - name: Commit data if it changed
+        run: |
+          git config user.name "ria-bot"
+          git config user.email "ria-bot@users.noreply.github.com"
+          git add data/sebi.json
+          if ! git diff --cached --quiet; then
+            git commit -m "SEBI updates $(date -u +%Y-%m-%d)"
+            for i in 1 2 3; do git pull --rebase -X theirs origin main && git push && break; sleep 5; done
+          fi
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - id: deploy
+        uses: actions/deploy-pages@v4
